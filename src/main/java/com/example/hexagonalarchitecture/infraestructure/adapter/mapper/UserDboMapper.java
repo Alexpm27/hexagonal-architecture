@@ -17,6 +17,8 @@ public interface UserDboMapper {
     @Mapping(source = "password", target = "password")
     @Mapping(source = "age", target = "age")
     @Mapping(source = "country", target = "country")
+    @Mapping(source = "code", target = "code")
+    @Mapping(source = "verified", target = "verified")
     @Mapping(source = "createdAt", target = "createdAt")
     UserEntity toDbo(User domain);
 

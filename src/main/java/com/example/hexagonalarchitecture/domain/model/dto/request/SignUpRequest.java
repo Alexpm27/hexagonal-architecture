@@ -9,12 +9,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class UserRequest {
+public class SignUpRequest {
 
     private String name;
+
     private String email;
+
     private String password;
-    private byte age;
-    private String country;
 
 }

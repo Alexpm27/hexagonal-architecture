@@ -28,9 +28,10 @@ public class UserEntity {
     private String password;
     private byte age;
     private String country;
+    private String code;
+    private Boolean verified;
     private LocalDateTime verifiedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
-
 }

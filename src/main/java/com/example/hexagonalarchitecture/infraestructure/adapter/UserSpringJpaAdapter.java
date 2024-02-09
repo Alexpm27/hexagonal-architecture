@@ -7,7 +7,10 @@ import com.example.hexagonalarchitecture.infraestructure.adapter.entity.UserEnti
 import com.example.hexagonalarchitecture.infraestructure.adapter.exception.UserException;
 import com.example.hexagonalarchitecture.infraestructure.adapter.mapper.UserDboMapper;
 import com.example.hexagonalarchitecture.infraestructure.adapter.repository.UserRepository;
+import com.example.hexagonalarchitecture.infraestructure.mail.EmailSenderService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -20,12 +23,19 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class UserSpringJpaAdapter implements UserPersistencePort {
+    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final UserDboMapper userDboMapper;
+    private final EmailSenderService emailSenderService;
 
-    public UserSpringJpaAdapter(UserRepository userRepository, UserDboMapper userDboMapper) {
+    @Value("${link.verify}")
+    private String link;
+
+    public UserSpringJpaAdapter(PasswordEncoder passwordEncoder, UserRepository userRepository, UserDboMapper userDboMapper, EmailSenderService emailSenderService) {
+        this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.userDboMapper = userDboMapper;
+        this.emailSenderService = emailSenderService;
     }
 
 
@@ -38,8 +48,10 @@ public class UserSpringJpaAdapter implements UserPersistencePort {
     public User create(User user) {
 
         var userToSave = userDboMapper.toDbo(user);
+        userToSave.setPassword(passwordEncoder.encode(user.getPassword()));
         var userSaved = userRepository.save(userToSave);
-
+        emailSenderService.sendSimpleEmail(userSaved.getEmail(), UserConstant.SUBJECT_MAIL,
+                UserConstant.BODY_MAIL + link + userSaved.getCode());
         return userDboMapper.toDomain(userSaved);
     }
 
@@ -50,9 +62,20 @@ public class UserSpringJpaAdapter implements UserPersistencePort {
 
         if (optionalUser.isEmpty()){
             throw new UserException(HttpStatus.NOT_FOUND,
-                    String.format(UserConstant.TASK_NOT_FOUND_MESSAGE_ERROR, id));
+                    String.format(UserConstant.USER_NOT_FOUND_MESSAGE_ERROR, id));
         }
 
+        return userDboMapper.toDomain(optionalUser.get());
+    }
+
+    @Override
+    public User getByEmail(String email) {
+        var optionalUser = userRepository.findByEmail(email);
+
+        if (optionalUser.isEmpty()){
+            throw new UserException(HttpStatus.NOT_FOUND,
+                    String.format(UserConstant.USER_NOT_FOUND_MESSAGE_ERROR, email));
+        }
         return userDboMapper.toDomain(optionalUser.get());
     }
 
@@ -83,9 +106,30 @@ public class UserSpringJpaAdapter implements UserPersistencePort {
         return userDboMapper.toDomain(userUpdated);
     }
 
+    @Override
+    public String verify(String code){
+        UserEntity user = findByCodeAndEnsureExists(code);
+        if (user != null){
+            user.setVerified(true);
+            user.setVerifiedAt(LocalDateTime.now());
+            userRepository.save(user);
+            return String.format(UserConstant.CODE_VERIFIED, user.getEmail());
+        }
+        throw new UserException(HttpStatus.NOT_FOUND,
+                String.format(UserConstant.CODE_NOT_FOUND_MESSAGE_ERROR, code));
+
+    }
 
     private UserEntity findAndEnsureExists(Long id) {
         return userRepository.findById(id).orElseThrow();
+    }
+
+    private UserEntity findByEmailAndEnsureExists(String email) {
+        return userRepository.findByEmail(email).orElseThrow();
+    }
+
+    private UserEntity findByCodeAndEnsureExists(String code) {
+        return userRepository.findByCode(code).orElseThrow();
     }
 
 }
