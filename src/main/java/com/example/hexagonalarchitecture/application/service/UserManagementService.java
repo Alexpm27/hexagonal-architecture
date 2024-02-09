@@ -3,10 +3,10 @@ package com.example.hexagonalarchitecture.application.service;
 import com.example.hexagonalarchitecture.application.mapper.UserDtoMapper;
 import com.example.hexagonalarchitecture.application.mapper.UserRequestMapper;
 import com.example.hexagonalarchitecture.application.usecases.UserService;
+import com.example.hexagonalarchitecture.domain.model.User;
 import com.example.hexagonalarchitecture.domain.model.dto.UserDto;
 import com.example.hexagonalarchitecture.domain.model.dto.request.UserRequest;
 import com.example.hexagonalarchitecture.domain.port.UserPersistencePort;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,7 +20,6 @@ public class UserManagementService implements UserService {
     private final UserRequestMapper userRequestMapper;
     private final UserDtoMapper userDtoMapper;
 
-    @Autowired
     public UserManagementService(final UserPersistencePort userPersistencePort,
                                  final UserRequestMapper userRequestMapper,
                                  final UserDtoMapper userDtoMapper) {
@@ -44,6 +43,17 @@ public class UserManagementService implements UserService {
     }
 
     @Override
+    public UserDto getByEmail(String email) {
+        var user = userPersistencePort.getByEmail(email);
+        return userDtoMapper.toDto(user);
+    }
+
+    @Override
+    public User getUsername(String email) {
+        return userPersistencePort.getByEmail(email);
+    }
+
+    @Override
     public List<UserDto> getAll() {
         var users = userPersistencePort.getAll();
         return users
@@ -55,6 +65,7 @@ public class UserManagementService implements UserService {
     @Override
     public void deleteById(Long id) { 
         var user = userPersistencePort.getById(id);
+        user.setDeletedAt(LocalDateTime.now());
         userPersistencePort.deleteById(id);
     }
 

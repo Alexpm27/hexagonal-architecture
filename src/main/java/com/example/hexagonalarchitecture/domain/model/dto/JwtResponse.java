@@ -9,12 +9,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class UserDto {
+public class JwtResponse {
+    private String jwtToken;
 
-    private Long id;
-    private String name;
-    private String email;
-    private byte age;
-    private String country;
-
+    private String username;
 }
