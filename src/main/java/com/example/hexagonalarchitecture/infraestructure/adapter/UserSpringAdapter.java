@@ -6,7 +6,7 @@ import com.example.hexagonalarchitecture.domain.port.UserPersistencePort;
 import com.example.hexagonalarchitecture.infraestructure.adapter.entity.UserEntity;
 import com.example.hexagonalarchitecture.infraestructure.adapter.exception.UserException;
 import com.example.hexagonalarchitecture.infraestructure.adapter.mapper.UserDboMapper;
-import com.example.hexagonalarchitecture.infraestructure.adapter.repository.UserRepository;
+import com.example.hexagonalarchitecture.infraestructure.adapter.repository.UserJpaRepository;
 import com.example.hexagonalarchitecture.infraestructure.mail.EmailSenderService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -22,28 +22,22 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class UserSpringJpaAdapter implements UserPersistencePort {
+public class UserSpringAdapter implements UserPersistencePort {
     private final PasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
+    private final UserJpaRepository userRepository;
     private final UserDboMapper userDboMapper;
     private final EmailSenderService emailSenderService;
 
     @Value("${link.verify}")
     private String link;
 
-    public UserSpringJpaAdapter(PasswordEncoder passwordEncoder, UserRepository userRepository, UserDboMapper userDboMapper, EmailSenderService emailSenderService) {
+    public UserSpringAdapter(PasswordEncoder passwordEncoder, UserJpaRepository userRepository, UserDboMapper userDboMapper, EmailSenderService emailSenderService) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.userDboMapper = userDboMapper;
         this.emailSenderService = emailSenderService;
     }
 
-
-    /**
-     * aqui se usa AWS DynamoDB
-     * @param user
-     * @return
-     */
     @Override
     public User create(User user) {
 

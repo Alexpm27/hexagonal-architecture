@@ -1,12 +1,9 @@
 package com.example.hexagonalarchitecture.infraestructure.adapter;
 
-import com.example.hexagonalarchitecture.application.usecases.UserService;
 import com.example.hexagonalarchitecture.domain.model.User;
 import com.example.hexagonalarchitecture.domain.model.constant.UserConstant;
 import com.example.hexagonalarchitecture.domain.model.dto.JwtResponse;
 import com.example.hexagonalarchitecture.domain.model.dto.request.JwtRequest;
-import com.example.hexagonalarchitecture.domain.model.dto.request.SignUpRequest;
-import com.example.hexagonalarchitecture.domain.model.dto.request.UserRequest;
 import com.example.hexagonalarchitecture.domain.port.AuthPort;
 import com.example.hexagonalarchitecture.domain.port.UserPersistencePort;
 import com.example.hexagonalarchitecture.infraestructure.adapter.exception.UserException;
@@ -21,7 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AuthSpringJpaAdapter implements AuthPort {
+public class AuthSpringAdapter implements AuthPort {
     @Autowired
     private CredentialDetailsServiceImpls userDetailsService;
     @Autowired
