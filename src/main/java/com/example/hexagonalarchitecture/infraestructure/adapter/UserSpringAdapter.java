@@ -50,7 +50,7 @@ public class UserSpringAdapter implements UserPersistencePort {
     }
 
     @Override
-    public User getById(Long id) {
+    public User getById(String id) {
 
         var optionalUser = userRepository.findById(id);
 
@@ -82,12 +82,12 @@ public class UserSpringAdapter implements UserPersistencePort {
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(String id) {
         userRepository.deleteById(id);
     }
 
     @Override
-    public User update(User user, Long id) {
+    public User update(User user, String id) {
         var userToUpdate = findAndEnsureExists(id);
         userToUpdate.setId(id);
         userToUpdate.setName(user.getName());
@@ -114,7 +114,7 @@ public class UserSpringAdapter implements UserPersistencePort {
 
     }
 
-    private UserEntity findAndEnsureExists(Long id) {
+    private UserEntity findAndEnsureExists(String id) {
         return userRepository.findById(id).orElseThrow();
     }
 
