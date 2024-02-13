@@ -23,6 +23,7 @@ public class UserEntity {
     @Id
     private String id;
     private String name;
+    @Column(unique=true)
     private String email;
     private String password;
     private byte age;

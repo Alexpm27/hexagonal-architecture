@@ -44,8 +44,10 @@ public class UserSpringAdapter implements UserPersistencePort {
         var userToSave = userDboMapper.toDbo(user);
         userToSave.setPassword(passwordEncoder.encode(user.getPassword()));
         var userSaved = userRepository.save(userToSave);
-        emailSenderService.sendSimpleEmail(userSaved.getEmail(), UserConstant.SUBJECT_MAIL,
-                UserConstant.BODY_MAIL + link + userSaved.getCode());
+        if (userSaved != null) {
+            emailSenderService.sendSimpleEmail(userSaved.getEmail(), UserConstant.SUBJECT_MAIL,
+                    UserConstant.BODY_MAIL + link + userSaved.getCode());
+        }
         return userDboMapper.toDomain(userSaved);
     }
 
