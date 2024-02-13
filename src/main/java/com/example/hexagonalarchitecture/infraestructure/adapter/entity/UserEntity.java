@@ -21,9 +21,9 @@ import java.util.Set;
 public class UserEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private String id;
     private String name;
+    @Column(unique=true)
     private String email;
     private String password;
     private byte age;

@@ -8,10 +8,10 @@ import java.util.List;
 public interface UserPersistencePort {
 
     User create(User user);
-    User getById(Long id);
+    User getById(String id);
     User getByEmail(String email);
     List<User> getAll();
-    void deleteById(Long id);
+    void deleteById(String id);
     String verify(String code);
-    User update(User user, Long id);
+    User update(User user, String id);
 }

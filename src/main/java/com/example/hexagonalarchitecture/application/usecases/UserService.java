@@ -9,10 +9,10 @@ import java.util.List;
 
 public interface UserService {
     UserDto createNew(UserRequest request);
-    UserDto getById(Long id);
+    UserDto getById(String id);
     UserDto getByEmail(String email);
     User getUsername(String email);
     List<UserDto> getAll();
-    void deleteById(Long id);
-    UserDto update(UserRequest request, Long id);
+    void deleteById(String id);
+    UserDto update(UserRequest request, String id);
 }

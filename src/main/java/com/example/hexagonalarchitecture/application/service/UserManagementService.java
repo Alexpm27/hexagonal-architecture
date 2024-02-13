@@ -37,7 +37,7 @@ public class UserManagementService implements UserService {
     }
 
     @Override
-    public UserDto getById(Long id) {
+    public UserDto getById(String id) {
         var user = userPersistencePort.getById(id);
         return userDtoMapper.toDto(user);
     }
@@ -63,14 +63,14 @@ public class UserManagementService implements UserService {
     }
 
     @Override
-    public void deleteById(Long id) { 
+    public void deleteById(String id) {
         var user = userPersistencePort.getById(id);
         user.setDeletedAt(LocalDateTime.now());
         userPersistencePort.deleteById(id);
     }
 
     @Override
-    public UserDto update(UserRequest request, Long id) {
+    public UserDto update(UserRequest request, String id) {
         var userToUpdate = userRequestMapper.toDomain(request);
         var userUpdated = userPersistencePort.update(userToUpdate, id);
 

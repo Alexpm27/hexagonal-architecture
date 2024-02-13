@@ -6,7 +6,7 @@ import com.example.hexagonalarchitecture.domain.port.UserPersistencePort;
 import com.example.hexagonalarchitecture.infraestructure.adapter.entity.UserEntity;
 import com.example.hexagonalarchitecture.infraestructure.adapter.exception.UserException;
 import com.example.hexagonalarchitecture.infraestructure.adapter.mapper.UserDboMapper;
-import com.example.hexagonalarchitecture.infraestructure.adapter.repository.UserRepository;
+import com.example.hexagonalarchitecture.infraestructure.adapter.repository.UserJpaRepository;
 import com.example.hexagonalarchitecture.infraestructure.mail.EmailSenderService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -22,41 +22,37 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class UserSpringJpaAdapter implements UserPersistencePort {
+public class UserSpringAdapter implements UserPersistencePort {
     private final PasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
+    private final UserJpaRepository userRepository;
     private final UserDboMapper userDboMapper;
     private final EmailSenderService emailSenderService;
 
     @Value("${link.verify}")
     private String link;
 
-    public UserSpringJpaAdapter(PasswordEncoder passwordEncoder, UserRepository userRepository, UserDboMapper userDboMapper, EmailSenderService emailSenderService) {
+    public UserSpringAdapter(PasswordEncoder passwordEncoder, UserJpaRepository userRepository, UserDboMapper userDboMapper, EmailSenderService emailSenderService) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.userDboMapper = userDboMapper;
         this.emailSenderService = emailSenderService;
     }
 
-
-    /**
-     * aqui se usa AWS DynamoDB
-     * @param user
-     * @return
-     */
     @Override
     public User create(User user) {
 
         var userToSave = userDboMapper.toDbo(user);
         userToSave.setPassword(passwordEncoder.encode(user.getPassword()));
         var userSaved = userRepository.save(userToSave);
-        emailSenderService.sendSimpleEmail(userSaved.getEmail(), UserConstant.SUBJECT_MAIL,
-                UserConstant.BODY_MAIL + link + userSaved.getCode());
+        if (userSaved != null) {
+            emailSenderService.sendSimpleEmail(userSaved.getEmail(), UserConstant.SUBJECT_MAIL,
+                    UserConstant.BODY_MAIL + link + userSaved.getCode());
+        }
         return userDboMapper.toDomain(userSaved);
     }
 
     @Override
-    public User getById(Long id) {
+    public User getById(String id) {
 
         var optionalUser = userRepository.findById(id);
 
@@ -88,12 +84,12 @@ public class UserSpringJpaAdapter implements UserPersistencePort {
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(String id) {
         userRepository.deleteById(id);
     }
 
     @Override
-    public User update(User user, Long id) {
+    public User update(User user, String id) {
         var userToUpdate = findAndEnsureExists(id);
         userToUpdate.setId(id);
         userToUpdate.setName(user.getName());
@@ -120,7 +116,7 @@ public class UserSpringJpaAdapter implements UserPersistencePort {
 
     }
 
-    private UserEntity findAndEnsureExists(Long id) {
+    private UserEntity findAndEnsureExists(String id) {
         return userRepository.findById(id).orElseThrow();
     }
 

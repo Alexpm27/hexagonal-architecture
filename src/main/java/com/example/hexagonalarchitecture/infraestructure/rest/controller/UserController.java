@@ -19,10 +19,13 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public UserDto getById(@PathVariable long id){
+    public UserDto getById(@PathVariable String id){
         return userService.getById(id);
     }
-
+    @GetMapping("/email/{email}")
+    public UserDto getByEmail(@PathVariable String email){
+        return userService.getByEmail(email);
+    }
     @GetMapping
     public List<UserDto> getAll() {
         return userService.getAll();
@@ -35,12 +38,12 @@ public class UserController {
 
     @PutMapping("/{id}")
     public UserDto userEdit(@RequestBody UserRequest taskRequest,
-                               @PathVariable Long id){
+                               @PathVariable String id){
         return userService.update(taskRequest, id);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUserById(@PathVariable Long id){
+    public void deleteUserById(@PathVariable String id){
         userService.deleteById(id);
     }
 }
