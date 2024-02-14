@@ -8,7 +8,9 @@ import com.example.hexagonalarchitecture.infraestructure.adapter.exception.UserE
 import com.example.hexagonalarchitecture.infraestructure.adapter.mapper.UserDboMapper;
 import com.example.hexagonalarchitecture.infraestructure.adapter.repository.UserJpaRepository;
 import com.example.hexagonalarchitecture.infraestructure.mail.EmailSenderService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,8 +30,8 @@ public class UserSpringAdapter implements UserPersistencePort {
     private final UserDboMapper userDboMapper;
     private final EmailSenderService emailSenderService;
 
-    @Value("${link.verify}")
-    private String link;
+    @Autowired
+    private Environment env;
 
     public UserSpringAdapter(PasswordEncoder passwordEncoder, UserJpaRepository userRepository, UserDboMapper userDboMapper, EmailSenderService emailSenderService) {
         this.passwordEncoder = passwordEncoder;
@@ -46,7 +48,7 @@ public class UserSpringAdapter implements UserPersistencePort {
         var userSaved = userRepository.save(userToSave);
         if (userSaved != null) {
             emailSenderService.sendSimpleEmail(userSaved.getEmail(), UserConstant.SUBJECT_MAIL,
-                    UserConstant.BODY_MAIL + link + userSaved.getCode());
+                    UserConstant.BODY_MAIL + env.getProperty("link.verify") + userSaved.getCode());
         }
         return userDboMapper.toDomain(userSaved);
     }

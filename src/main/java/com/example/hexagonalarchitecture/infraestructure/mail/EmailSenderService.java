@@ -1,6 +1,7 @@
 package com.example.hexagonalarchitecture.infraestructure.mail;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -9,13 +10,15 @@ import org.springframework.stereotype.Service;
 public class EmailSenderService {
     @Autowired
     private JavaMailSender mailSender;
+    @Autowired
+    private Environment env;
 
     public void sendSimpleEmail(String toEmail,
                                 String subject,
                                 String body
     ) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("alexpm.dev@gmail.com");
+        message.setFrom(env.getProperty("spring.mail.username"));
         message.setTo(toEmail);
         message.setText(body);
         message.setSubject(subject);
